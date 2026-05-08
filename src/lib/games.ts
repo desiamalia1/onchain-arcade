@@ -1,4 +1,4 @@
-export type GameId = 0 | 1 | 2 | 3;
+export type GameId = 0 | 1 | 2 | 3 | 4;
 
 export type GameMeta = {
   id: GameId;
@@ -13,6 +13,7 @@ export const GAMES: readonly GameMeta[] = [
   { id: 1, slug: 'runner', name: 'Rocket Runner', emoji: '🚀', blurb: 'Dodge asteroids in deep space.' },
   { id: 2, slug: 'snake', name: 'Snake', emoji: '🐍', blurb: 'Eat food, grow longer, avoid yourself.' },
   { id: 3, slug: 'flappy', name: 'Flappy', emoji: '🐤', blurb: 'Tap to flap. Don\'t hit the pipes.' },
+  { id: 4, slug: 'memory', name: 'Memory', emoji: '🧠', blurb: 'Flip cards, find matching pairs.' },
 ] as const;
 
 export function getGame(id: GameId): GameMeta {

@@ -7,6 +7,7 @@ import { Game2048 } from './components/games/Game2048';
 import { Runner } from './components/games/Runner';
 import { Snake } from './components/games/Snake';
 import { Flappy } from './components/games/Flappy';
+import { Memory } from './components/games/Memory';
 import { getGame, type GameId } from './lib/games';
 
 export default function App() {
@@ -43,6 +44,7 @@ export default function App() {
       case 1: return <Runner key={`g1-${resetKey}`} {...props} />;
       case 2: return <Snake key={`g2-${resetKey}`} {...props} />;
       case 3: return <Flappy key={`g3-${resetKey}`} {...props} />;
+      case 4: return <Memory key={`g4-${resetKey}`} {...props} />;
     }
   };
 
