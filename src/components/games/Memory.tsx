@@ -95,7 +95,7 @@ export function Memory({ resetKey, onScore }: Props) {
       const y = PAD + row * (CARD_H + GAP);
       const card = cards[i];
       ctx.beginPath();
-      ctx.roundRect(x, y, CARD_W, CARD_H, 8);
+      ctx.rect(x, y, CARD_W, CARD_H);
       if (card.matched) {
         ctx.fillStyle = '#1a3a1a'; ctx.fill();
         ctx.strokeStyle = '#2d5a2d'; ctx.lineWidth = 2; ctx.stroke();
