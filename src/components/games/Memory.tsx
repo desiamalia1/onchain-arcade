@@ -125,7 +125,7 @@ export function Memory({ resetKey, onScore }: Props) {
     }
   }, [onScore]);
 
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => { draw(); }, [draw, tick]);
 
   const handleClick = useCallback(
     (e: React.MouseEvent | React.TouchEvent) => {
