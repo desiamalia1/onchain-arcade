@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/access/Ownable2Step.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 
-/// @title GameScoresV2 - multi-game on-chain leaderboard with auto-forwarded dev fees
+/// @title  GameScoresV2 - multi-game on-chain leaderboard with auto-forwarded dev fees
 /// @notice 5 games pre-registered (2048, Rocket Runner, Snake, Flappy, Memory).
 ///         Each submitScore auto-forwards the fee to the hardcoded dev address.
 ///         Owner can register more games anytime via registerGame().
@@ -54,7 +54,12 @@ contract GameScoresV2 is Ownable2Step, ReentrancyGuard, Pausable {
 
     event GameRegistered(uint256 indexed gameId, string name);
     event GameUpdated(uint256 indexed gameId, bool enabled, uint256 maxScore, uint256 submissionFee, uint256 cooldown);
-    event ScoreSubmitted(uint256 indexed gameId,     event ScoreSubmitted(uint256 indexed gameId,     event ScoreSubmieForwa    (address indexed to, u    event ScoreSubmittent FeeAccrued(uint256 am    event ScoreSubmittethdrawn(add    event ScoreSubmitted(uint256 indexe// ============ Errors ============
+    event ScoreSubmitted(uint256 indexed gameId, address indexed player, uint256 score, uint256 entryId);
+    event FeeForwarded(address indexed to, uint256 amount);
+    event FeeAccrued(uint256 amount);
+    event FeesWithdrawn(address indexed to, uint256 amount);
+
+    // ============ Errors ============
 
     error GameNotFound();
     error GameDisabled();
@@ -63,9 +68,14 @@ contract GameScoresV2 is Ownable2Step, ReentrancyGuard, Pausable {
     error ScoreExceedsMax();
     error CooldownActive(uint256 retryAt);
     error TransferFailed();
-    error Empty    error Empty    error Empty    error Em========    error Empty    error Empty    error Empty    error Em========   (admin).
+    error EmptyName();
+
+    // ============ Constructor ============
+
+    /// @param initialOwner Address that will own the contract (admin).
     constructor(address initialOwner) Ownable(initialOwner) {
-                                                                                     _registerGame("2048",          0, 0, 0);
+        // Seed 5 launch games.
+        _registerGame("2048",          0, 0, 0);
         _registerGame("Rocket Runner", 0, 0, 0);
         _registerGame("Snake",         0, 0, 0);
         _registerGame("Flappy",        0, 0, 0);
@@ -85,25 +95,32 @@ contract GameScoresV2 is Ownable2Step, ReentrancyGuard, Pausable {
 
     function _registerGame(
         string memory name,
-        uint256        uint256        u56 submissionFee,
+        uint256 maxScore,
+        uint256 submissionFee,
         uint256 cooldown
     ) internal returns (uint256 id) {
         if (bytes(name).length == 0) revert EmptyName();
         id = nextGameId++;
         _games[id] = Game({
             name: name,
-                                                                       submissionFee: submissionFee,
+            enabled: true,
+            maxScore: maxScore,
+            submissionFee: submissionFee,
             cooldown: cooldown
         });
         emit GameRegistered(id, name);
-                                           , submissionFee, cooldown);
+        emit GameUpdated(id, true, maxScore, submissionFee, cooldown);
     }
 
     function updateGame(
-                                                                                                onFee,
+        uint256 gameId,
+        bool enabled,
+        uint256 maxScore,
+        uint256 submissionFee,
         uint256 cooldown
     ) external onlyOwner {
-        if (gameId >= nextGameId)        if (gameId >= nextGa          if (game = _games[gameId];
+        if (gameId >= nextGameId) revert GameNotFound();
+        Game storage g = _games[gameId];
         g.enabled = enabled;
         g.maxScore = maxScore;
         g.submissionFee = submissionFee;
@@ -111,8 +128,8 @@ contract GameScoresV2 is Ownable2Step, ReentrancyGuard, Pausable {
         emit GameUpdated(gameId, enabled, maxScore, submissionFee, cooldown);
     }
 
-    function   use() external onlyOwner { _pause(); }
-    function un    function un    lyOwner { _unpause(); }
+    function pause() external onlyOwner { _pause(); }
+    function unpause() external onlyOwner { _unpause(); }
 
     // ============ Player: submit score ============
 
@@ -222,7 +239,7 @@ contract GameScoresV2 is Ownable2Step, ReentrancyGuard, Pausable {
     }
 
     /// @notice Top n scores (highest first). O(n*m). Keep n small (<=50).
-    function getTopScores(uint256 gameId, uint256 n) external view     function g[] memory out) {
+    function getTopScores(uint256 gameId, uint256 n) external view returns (Entry[] memory out) {
         Entry[] storage list = _scores[gameId];
         uint256 len = list.length;
         if (n > len) n = len;
