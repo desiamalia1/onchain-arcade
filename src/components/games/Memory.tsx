@@ -48,7 +48,7 @@ export function Memory({ resetKey, onScore }: Props) {
   const matchedRef = useRef(0);
   const scoreRef = useRef(0);
   const gameOverRef = useRef(false);
-  const [, setTick] = useState(0);
+  const [tick, setTick] = useState(0);
 
   const forceRender = () => setTick((t) => t + 1);
 
